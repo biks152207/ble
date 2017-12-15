@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">BLeDevice</string>
+    <string moduleConfig="true" name="reactNativeCodePush_androidDeploymentKey">Dvqgc2LmWipV_MpDjIhtKzoGSihZ7eb88151-88f6-4cf6-be3e-d93559f98525</string>
+    <string name="app_name">axle</string>
 </resources>

@@ -1,6 +1,25 @@
 apply plugin: "com.android.application"
-
 import com.android.build.OutputFile
+
+buildscript {
+  repositories {
+    maven { url 'https://maven.fabric.io/public' }
+  }
+
+  dependencies {
+    // These docs use an open ended version so that our plugin
+    // can be updated quickly in response to Android tooling updates
+
+    // We recommend changing it to the latest version from our changelog:
+    // https://docs.fabric.io/android/changelog.html#fabric-gradle-plugin
+    classpath 'io.fabric.tools:gradle:1.+'
+  }
+}
+apply plugin: 'io.fabric'
+
+repositories {
+  maven { url 'https://maven.fabric.io/public' }
+}
 
 /**
  * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
@@ -72,11 +91,8 @@ import com.android.build.OutputFile
  * ]
  */
 
-project.ext.react = [
-    entryFile: "index.js"
-]
-
 apply from: "../../node_modules/react-native/react.gradle"
+apply from: "../../node_modules/react-native-code-push/android/codepush.gradle"
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -94,17 +110,38 @@ def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
+
+    dexOptions {
+    incremental true
+    javaMaxHeapSize "4g"
+    }
+
+    aaptOptions{
+    cruncherEnabled false
+}
+
 
     defaultConfig {
-        applicationId "com.bledevice"
-        minSdkVersion 16
+        applicationId "com.axle"
+        minSdkVersion 21
         targetSdkVersion 22
-        versionCode 1
-        versionName "1.0"
+        versionCode 13
+        versionName "1.13"
         ndk {
             abiFilters "armeabi-v7a", "x86"
+        }
+        multiDexEnabled true
+    }
+    signingConfigs {
+        release {
+            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
+                storeFile file(MYAPP_RELEASE_STORE_FILE)
+                storePassword MYAPP_RELEASE_STORE_PASSWORD
+                keyAlias MYAPP_RELEASE_KEY_ALIAS
+                keyPassword MYAPP_RELEASE_KEY_PASSWORD
+            }
         }
     }
     splits {
@@ -119,6 +156,7 @@ android {
         release {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
         }
     }
     // applicationVariants are e.g. debug, release
@@ -137,9 +175,37 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-bluetooth-manager')
+    compile project(':react-native-svg')
+    compile project(':react-native-ble-manager')
+    compile project(':react-native-fabric')
+    compile project(':react-native-wheel-picker-android')
+    compile project(':react-native-device-info')
+    compile project(':react-native-push-notification')
+    compile project(':react-native-code-push')
+    compile project(':react-native-background-geolocation')
+    compile 'com.facebook.fresco:animated-base-support:0.14.1'
+   compile 'com.facebook.fresco:animated-gif:0.14.1'
+   compile 'com.facebook.fresco:animated-webp:0.14.0'
+   compile 'com.facebook.fresco:webpsupport:0.14.0'
+   compile 'com.facebook.fresco:webpsupport:0.14.0'
+    compile(name: 'tslocationmanager', ext: 'aar')
+    compile project(':react-native-camera')
     compile fileTree(dir: "libs", include: ["*.jar"])
+    compile project(':react-native-background-timer')
+    compile project(':react-native-document-scanner')
+    compile project(':react-native-vector-icons')
+    compile project(':react-native-image-picker')
+    compile project(':reactnativemapboxgl')
+    compile(name: 'tslocationmanager', ext: 'aar')
+    //compile 'com.google.android.gms:play-services-location:11.0.0'
+    compile 'com.android.support:multidex:1.0.1'
     compile "com.android.support:appcompat-v7:23.0.1"
     compile "com.facebook.react:react-native:+"  // From node_modules
+    compile project(':reactnativesignaturecapture') // <-- add this line
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
+  transitive = true;
+}
 }
 
 // Run this once to be able to run the application with BUCK
@@ -147,4 +213,10 @@ dependencies {
 task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
+}
+
+repositories {
+   flatDir {
+       dirs "../../node_modules/react-native-background-geolocation/android/libs"
+   }
 }

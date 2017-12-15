@@ -1,4 +1,7 @@
 {
-  "name": "BLeDevice",
-  "displayName": "BLeDevice"
+  "expo": {
+    "sdkVersion": "19.0.0"
+  },
+  "name": "axle",
+  "displayName": "axle"
 }
